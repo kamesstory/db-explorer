@@ -14,20 +14,23 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
 
   const { selectedColumns, setSelectedColumns } = useContext(TableContext);
 
-  const selectColumn = useCallback(() => {
-    setSelectedColumns((columns) => {
-      // TODO: need uniqueness of table schemas + names + column names
-      console.log(`Adding ${data.name} to the list of selected columns.`);
-      return [...columns, data.name];
-    });
-  }, []);
-
   // Feels inefficient
   const isSelected = useMemo(() => {
     console.log(
       `Recalculating isSelected for column ${data.name} with ${selectedColumns}.`
     );
     return selectedColumns.includes(data.name);
+  }, [selectedColumns]);
+
+  const selectColumn = useCallback(() => {
+    // TODO: need uniqueness of table schemas + names + column names
+    if (isSelected) {
+      console.log(`Removing ${data.name} from the list of selected columns.`);
+      setSelectedColumns(selectedColumns.filter((c) => c !== data.name));
+    } else {
+      console.log(`Adding ${data.name} to the list of selected columns.`);
+      setSelectedColumns([...selectedColumns, data.name]);
+    }
   }, [selectedColumns]);
 
   // We probably need a context to save and track the state of the values of each node that's being used here
