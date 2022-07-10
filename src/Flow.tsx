@@ -83,7 +83,10 @@ const OverviewFlow = () => {
     setEdges(getTableRelationNodes(relations));
   }, [relations]);
 
-  const onConnect = (params: Connection) => setEdges((e) => addEdge(params, e));
+  const onConnect = (params: Connection) => {
+    setEdges((e) => addEdge(params, e));
+    // TODO: after setting edges, we should update createdRelations
+  };
 
   return (
     <ReactFlow

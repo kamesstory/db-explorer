@@ -2,21 +2,32 @@ import {
   CSSProperties,
   FunctionComponent,
   useCallback,
+  useContext,
   useMemo,
   useState,
 } from "react";
 import { Handle, Position } from "react-flow-renderer";
-import { TableColumn } from "../TableContext";
+import { TableColumn, TableContext } from "../TableContext";
 
 const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
   const [isHovered, setHovered] = useState(false);
-  const [isSelected, setSelected] = useState(false);
 
-  const handleStyle = useMemo<CSSProperties>(() => {
-    const handleVisible = isHovered || isSelected;
+  const { selectedColumns, setSelectedColumns } = useContext(TableContext);
 
-    return { visibility: handleVisible ? "visible" : "hidden" };
-  }, [isHovered, isSelected]);
+  const selectColumn = useCallback(() => {
+    setSelectedColumns((columns) => {
+      console.log(`Adding ${data.name} to the list of selected columns.`);
+      return [...columns, data.name];
+    });
+  }, []);
+
+  // Feels inefficient
+  const isSelected = useMemo(() => {
+    console.log(
+      `Recalculating isSelected for column ${data.name} with ${selectedColumns}.`
+    );
+    return selectedColumns.includes(data.name);
+  }, [selectedColumns]);
 
   // We probably need a context to save and track the state of the values of each node that's being used here
   // The context should take in the column data and deterministically understand the state of the graph and
@@ -24,6 +35,12 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
   //
   // We're not using React Flow to manage this type of state since React Flow should only govern the state
   // related to the graph (e.g. what's connected to what, relative positions, etc.)
+
+  const handleStyle = useMemo<CSSProperties>(() => {
+    const handleVisible = isHovered || isSelected;
+
+    return { visibility: handleVisible ? "visible" : "hidden" };
+  }, [isHovered, isSelected]);
 
   return (
     <div className="w-96">
@@ -34,7 +51,7 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
         }`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={() => setSelected(!isSelected)}
+        onClick={selectColumn}
       >
         <span className="flex-1 flex items-start">{data.name}</span>
         <span className="flex-1 flex items-start">{data.dataType}</span>

@@ -1,4 +1,11 @@
-import { createContext, FunctionComponent, useEffect, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { Edge, Node, Position } from "react-flow-renderer";
 import { getTables, getTableRelations } from "./InitialElements";
 
@@ -26,6 +33,10 @@ export const TableContextProvider: FunctionComponent<{
   const [tables, setTables] = useState<TableSchema[]>([]);
   const [relations, setRelations] = useState<TableRelation[]>([]);
 
+  const [selectedTables, setSelectedTables] = useState<string[]>([]);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [createdRelations, setCreatedRelations] = useState<string[]>([]);
+
   useEffect(() => {
     setTables(getTables());
     setRelations(getTableRelations());
@@ -36,6 +47,10 @@ export const TableContextProvider: FunctionComponent<{
       value={{
         tables,
         relations,
+        selectedTables,
+        setSelectedTables,
+        selectedColumns,
+        setSelectedColumns,
       }}
     >
       {children}
@@ -46,7 +61,15 @@ export const TableContextProvider: FunctionComponent<{
 export const TableContext = createContext<{
   tables: TableSchema[];
   relations: TableRelation[];
+  selectedTables: string[];
+  setSelectedTables: Dispatch<SetStateAction<string[]>>;
+  selectedColumns: string[];
+  setSelectedColumns: Dispatch<SetStateAction<string[]>>;
 }>({
   tables: [],
   relations: [],
+  selectedTables: [],
+  setSelectedTables: () => {},
+  selectedColumns: [],
+  setSelectedColumns: () => {},
 });
