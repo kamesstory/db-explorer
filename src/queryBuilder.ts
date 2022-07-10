@@ -149,7 +149,7 @@ export const queryBuilder = ({
     );
   });
 
-  const sqlExpression = sqlExpressionParts.join(" ");
+  const sqlExpression = sqlExpressionParts.join("\n");
 
   return sqlExpression;
 };

@@ -16,9 +16,10 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
 
   // Feels inefficient
   const isSelected = useMemo(() => {
-    console.log(
-      `Recalculating isSelected for column ${data.name} with ${selectedColumns}.`
-    );
+    // TODO: make this a bit more efficient
+    // console.log(
+    //   `Recalculating isSelected for column ${data.name} with ${selectedColumns}.`
+    // );
     return selectedColumns.includes(data.name);
   }, [selectedColumns]);
 
