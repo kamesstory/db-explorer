@@ -14,7 +14,7 @@ const QueryPreview: FunctionComponent = () => {
   }, [tables, relations, selectedColumns]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mt-6">
       <span>Yoyoyoyo</span>
       <button onClick={buildQuery}>Preview query</button>
     </div>
