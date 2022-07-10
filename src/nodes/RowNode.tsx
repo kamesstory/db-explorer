@@ -1,7 +1,6 @@
 import { CSSProperties, FunctionComponent, useMemo, useState } from "react";
 import { Handle, Position } from "react-flow-renderer";
 import { TableColumn } from "../informationSchema";
-import "./RowNode.css";
 
 const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
   const [isHovered, setHovered] = useState(false);
@@ -14,11 +13,11 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
   }, [isHovered, isSelected]);
 
   return (
-    <div className="row-node-container">
+    <div className="w-96">
       <Handle type="target" position={Position.Left} style={handleStyle} />
-      <div className="row-node-row">
-        <span className="row-node-name">{data.name}</span>
-        <span className="row-node-data-type">{data.dataType}</span>
+      <div className="flex flex-row space-x-4">
+        <span className="flex-1 flex items-start">{data.name}</span>
+        <span className="flex-1 flex items-start">{data.dataType}</span>
       </div>
       <Handle type="source" position={Position.Right} style={handleStyle} />
     </div>
