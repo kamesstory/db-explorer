@@ -18,21 +18,16 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
     return { visibility: handleVisible ? "visible" : "hidden" };
   }, [isHovered, isSelected]);
 
-  const startHover = useCallback(() => {
-    setHovered(true);
-  }, []);
-
-  const endHover = useCallback(() => {
-    setHovered(false);
-  }, []);
-
   return (
     <div className="w-96">
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <div
-        className="flex flex-row space-x-4 px-3"
-        onMouseEnter={startHover}
-        onMouseLeave={endHover}
+        className={`flex flex-row space-x-4 px-3 ${
+          isHovered && "bg-slate-300"
+        }`}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={() => setSelected(!isSelected)}
       >
         <span className="flex-1 flex items-start">{data.name}</span>
         <span className="flex-1 flex items-start">{data.dataType}</span>
