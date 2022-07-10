@@ -12,9 +12,10 @@ https://github.com/kamesstory/bun-typescript-react.git
 
 ### Development
 
-Run the development server with the following command.:
+Run the development server with the following commands:
 
 ```
+npx tailwindcss -i ./public/tailwind.css -o ./src/tailwind.css --watch
 bun dev
 ```
 
