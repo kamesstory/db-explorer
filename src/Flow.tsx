@@ -9,7 +9,7 @@ import ReactFlow, {
   Connection,
 } from "react-flow-renderer";
 import { getTableNodes, getTableRelationNodes } from "./informationSchema";
-import RowNode from "./RowNode";
+import RowNode from "./nodes/RowNode";
 
 const OverviewFlow = () => {
   const nodeTypes = useMemo(() => ({ rowNode: RowNode }), []);

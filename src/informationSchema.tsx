@@ -1,5 +1,5 @@
 import { Edge, Node, Position } from "react-flow-renderer";
-import RowNode from "./RowNode";
+import RowNode from "./nodes/RowNode";
 
 export type TableRelation = {
   tableName: string;
@@ -118,9 +118,6 @@ export const getTableNodes = (): Node[] => {
       position: { x: 25, y: (index + 1) * 40 },
       targetPosition: Position.Left,
       sourcePosition: Position.Right,
-      style: {
-        width: "450px",
-      },
       parentNode: table.name,
       draggable: false,
     }));
