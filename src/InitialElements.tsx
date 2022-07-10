@@ -3,7 +3,6 @@ import { MarkerType } from "react-flow-renderer";
 export const nodes = [
   {
     id: "1",
-    type: "input",
     data: {
       label: (
         <>
@@ -16,13 +15,27 @@ export const nodes = [
   {
     id: "2",
     data: {
-      label: (
-        <>
-          This is a <strong>default node</strong>
-        </>
-      ),
+      label: <>Group 2</>,
     },
-    position: { x: 100, y: 100 },
+    position: { x: 100, y: 50 },
+  },
+  {
+    id: "2.1",
+    data: {
+      label: <>Default node 2</>,
+    },
+    parentNode: "2",
+    position: { x: 10, y: 10 },
+    draggable: false,
+  },
+  {
+    id: "2.2",
+    data: {
+      label: <>Default node 3</>,
+    },
+    parentNode: "2",
+    position: { x: 10, y: 50 },
+    draggable: false,
   },
   {
     id: "3",

@@ -8,17 +8,15 @@ import ReactFlow, {
   useEdgesState,
   Connection,
 } from "react-flow-renderer";
-
-import {
-  nodes as initialNodes,
-  edges as initialEdges,
-} from "./InitialElements";
+import { getTableNodes, getTableRelationNodes } from "./informationSchema";
 
 const OverviewFlow = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<{
     label: JSX.Element | string;
-  }>(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  }>(getTableNodes());
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    getTableRelationNodes()
+  );
   const onConnect = (params: Connection) =>
     setEdges((eds) => addEdge(params, eds));
 
@@ -35,7 +33,6 @@ const OverviewFlow = () => {
       fitView
       attributionPosition="top-right"
     >
-      <MiniMap nodeStrokeColor="#eee" nodeColor="#fff" nodeBorderRadius={2} />
       <Controls />
       <Background color="#aaa" gap={16} />
     </ReactFlow>
