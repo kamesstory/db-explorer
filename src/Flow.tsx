@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import ReactFlow, {
   addEdge,
   MiniMap,
@@ -9,8 +9,11 @@ import ReactFlow, {
   Connection,
 } from "react-flow-renderer";
 import { getTableNodes, getTableRelationNodes } from "./informationSchema";
+import RowNode from "./RowNode";
 
 const OverviewFlow = () => {
+  const nodeTypes = useMemo(() => ({ rowNode: RowNode }), []);
+
   const [nodes, setNodes, onNodesChange] = useNodesState<{
     label: JSX.Element | string;
   }>(getTableNodes());
@@ -22,6 +25,7 @@ const OverviewFlow = () => {
 
   return (
     <ReactFlow
+      nodeTypes={nodeTypes}
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}

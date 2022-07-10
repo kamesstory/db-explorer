@@ -1,18 +1,19 @@
 import { Edge, Node, Position } from "react-flow-renderer";
+import RowNode from "./RowNode";
 
-type TableRelation = {
+export type TableRelation = {
   tableName: string;
   columnName: string;
   foreignTableName: string;
   foreignColumnName: string;
 };
 
-type TableSchema = {
+export type TableSchema = {
   name: string;
   columns: TableColumn[];
 };
 
-type TableColumn = {
+export type TableColumn = {
   dataType: string; // Should be enum of some kind
   name: string;
   isNullable?: boolean;
@@ -101,7 +102,7 @@ export const getTableNodes = (): Node[] => {
       data: {
         label: table.name,
       },
-      position: { x: (index + 1) * 300, y: 100 }, // TODO: calculate position in a better way,
+      position: { x: (index + 1) * 700, y: 100 }, // TODO: calculate position in a better way,
       targetPosition: Position.Left,
       sourcePosition: Position.Right,
       style: {
@@ -112,9 +113,8 @@ export const getTableNodes = (): Node[] => {
 
     const columnNodes = table.columns.map<Node>((column, index) => ({
       id: `${table.name}.${column.name}`,
-      data: {
-        label: column.name,
-      },
+      type: "rowNode",
+      data: column,
       position: { x: 25, y: (index + 1) * 40 },
       targetPosition: Position.Left,
       sourcePosition: Position.Right,
@@ -140,6 +140,7 @@ export const getTableRelationNodes = (): Edge[] => {
     target: relation.foreignTableName,
     animated: true,
     label: "Default relationship",
+    zIndex: 9999,
   }));
 
   return relationshipNodes;
