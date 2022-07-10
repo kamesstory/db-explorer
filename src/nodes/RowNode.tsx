@@ -16,6 +16,7 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
 
   const selectColumn = useCallback(() => {
     setSelectedColumns((columns) => {
+      // TODO: need uniqueness of table schemas + names + column names
       console.log(`Adding ${data.name} to the list of selected columns.`);
       return [...columns, data.name];
     });
