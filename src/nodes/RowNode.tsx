@@ -23,7 +23,7 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
       <Handle type="target" position={Position.Left} style={handleStyle} />
       <div
         className={`flex flex-row space-x-4 px-3 ${
-          isHovered && "bg-slate-300"
+          (isHovered || isSelected) && "bg-slate-300"
         }`}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
