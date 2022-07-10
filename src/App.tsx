@@ -9,7 +9,9 @@ const App: FunctionComponent = () => {
   return (
     <TableContextProvider>
       <div className="App">
-        <Flow />
+        <div className="h-5/6">
+          <Flow />
+        </div>
         <QueryPreview />
       </div>
     </TableContextProvider>
