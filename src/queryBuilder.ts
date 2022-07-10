@@ -1,4 +1,4 @@
-import { TableRelation, TableSchema } from "./TableContext";
+import { TableColumn, TableRelation, TableSchema } from "./TableContext";
 
 type NodeRelation = {
   relation: TableRelation;
@@ -53,6 +53,7 @@ export const queryBuilder = ({
         tableRelation.foreignTableName
       )!;
 
+      // TODO: gotta do two-way here
       tableNode.relations.push({
         relation: tableRelation,
         node: foreignTableNode,
@@ -62,12 +63,31 @@ export const queryBuilder = ({
 
   // Inefficient BFS to build the joins, but it should work for a small set since this is
   // just a prototype
-  const tablesToExplore = 
-  // const fromStatement = "FROM";
-  // selectedColumns.forEach((column) => {
-  //   const table = tables
-  //     .filter((t) => t.columns.map((c) => c.name).includes(column))
-  //     .pop();
-  //   const;
-  // });
+  //
+  // Technically we can just use Dijkstra's and evaluate at every step, instead of the goal,
+  // whether or not all the required tables have been hit. If we completely saturate the graph
+  // with a starting node in it and we don't have all the required nodes (i.e. tables), this
+  // FROM statement is impossible to generate
+  //
+  // Actually best algorithm is the one where you connect all the required tables to each other
+  // inside a graph, and then you selectively include edges that are the shortest distance until
+  // the graph is fully connected. That gives you the least amount of joins total.
+
+  const requiredColumns: TableColumn[] = selectedColumns.map(
+    (selectedColumn) => {
+      return tables
+        .flatMap((table) =>
+          table.columns.filter(
+            (tableColumn) => tableColumn.name === selectedColumn
+          )
+        )
+        .pop()!;
+    }
+  );
+  const tablesToExplore = new Set<string>(
+    requiredColumns.map((column) => column.tableName)
+  );
+  const exploredTables = new Set<string>();
+
+  const fromStatement = "FROM";
 };

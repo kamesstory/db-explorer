@@ -2,7 +2,7 @@ import { TableRelation, TableSchema } from "./TableContext";
 
 export const getTables = (): TableSchema[] => {
   // Pretend this is an async call
-  const userTable = {
+  const userTable: TableSchema = {
     name: "user",
     columns: [
       {
@@ -34,10 +34,13 @@ export const getTables = (): TableSchema[] => {
         dataType: "uuid",
         isNullable: true,
       },
-    ],
+    ].map((column) => ({
+      ...column,
+      tableName: "user",
+    })),
   };
 
-  const profileTable = {
+  const profileTable: TableSchema = {
     name: "profile",
     columns: [
       {
@@ -56,7 +59,10 @@ export const getTables = (): TableSchema[] => {
         name: "image512",
         dataType: "text",
       },
-    ],
+    ].map((column) => ({
+      ...column,
+      tableName: "profile",
+    })),
   };
 
   return [userTable, profileTable];

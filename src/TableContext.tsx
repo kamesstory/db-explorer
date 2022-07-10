@@ -26,6 +26,7 @@ export type TableColumn = {
   dataType: string; // Should be enum of some kind
   name: string;
   isNullable?: boolean;
+  tableName: string;
 };
 
 export const TableContextProvider: FunctionComponent<{
