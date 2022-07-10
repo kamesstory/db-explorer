@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { Handle, Position } from "react-flow-renderer";
-import { TableColumn } from "../informationSchema";
+import { TableColumn } from "../TableContext";
 
 const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
   const [isHovered, setHovered] = useState(false);
@@ -17,6 +17,13 @@ const RowNode: FunctionComponent<{ data: TableColumn }> = ({ data }) => {
 
     return { visibility: handleVisible ? "visible" : "hidden" };
   }, [isHovered, isSelected]);
+
+  // We probably need a context to save and track the state of the values of each node that's being used here
+  // The context should take in the column data and deterministically understand the state of the graph and
+  // the node.
+  //
+  // We're not using React Flow to manage this type of state since React Flow should only govern the state
+  // related to the graph (e.g. what's connected to what, relative positions, etc.)
 
   return (
     <div className="w-96">

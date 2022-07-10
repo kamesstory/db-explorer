@@ -562,6 +562,10 @@ video {
   visibility: visible;
 }
 
+.relative {
+  position: relative;
+}
+
 .flex {
   display: flex;
 }

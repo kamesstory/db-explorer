@@ -1,5 +1,5 @@
+import { createContext, FunctionComponent, useEffect, useState } from "react";
 import { Edge, Node, Position } from "react-flow-renderer";
-import RowNode from "./nodes/RowNode";
 
 export type TableRelation = {
   tableName: string;
@@ -19,7 +19,7 @@ export type TableColumn = {
   isNullable?: boolean;
 };
 
-export const getTables = (): TableSchema[] => {
+const getTables = (): TableSchema[] => {
   // Pretend this is an async call
   const userTable = {
     name: "user",
@@ -81,7 +81,7 @@ export const getTables = (): TableSchema[] => {
   return [userTable, profileTable];
 };
 
-export const getTableRelations = (): TableRelation[] => {
+const getTableRelations = (): TableRelation[] => {
   // Pretend this is an async call
   return [
     {
@@ -93,9 +93,7 @@ export const getTableRelations = (): TableRelation[] => {
   ];
 };
 
-export const getTableNodes = (): Node[] => {
-  const tables = getTables();
-
+export const getTableNodes = (tables: TableSchema[]): Node[] => {
   const tableNodes = tables.flatMap<Node>((table, index) => {
     const tableNode: Node = {
       id: table.name,
@@ -128,9 +126,9 @@ export const getTableNodes = (): Node[] => {
   return tableNodes;
 };
 
-export const getTableRelationNodes = (): Edge[] => {
-  const tableRelations = getTableRelations();
-
+export const getTableRelationNodes = (
+  tableRelations: TableRelation[]
+): Edge[] => {
   const relationshipNodes = tableRelations.map<Edge>((relation) => ({
     id: `relation.${relation.tableName}.to.${relation.foreignTableName}`,
     source: relation.tableName,
@@ -142,3 +140,34 @@ export const getTableRelationNodes = (): Edge[] => {
 
   return relationshipNodes;
 };
+
+export const TableContextProvider: FunctionComponent<{
+  children: JSX.Element;
+}> = ({ children }) => {
+  const [tables, setTables] = useState<TableSchema[]>([]);
+  const [relations, setRelations] = useState<TableRelation[]>([]);
+
+  useEffect(() => {
+    setTables(getTables());
+    setRelations(getTableRelations());
+  }, []);
+
+  return (
+    <TableContext.Provider
+      value={{
+        tables,
+        relations,
+      }}
+    >
+      {children}
+    </TableContext.Provider>
+  );
+};
+
+export const TableContext = createContext<{
+  tables: TableSchema[];
+  relations: TableRelation[];
+}>({
+  tables: [],
+  relations: [],
+});
