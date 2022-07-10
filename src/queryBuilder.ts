@@ -110,8 +110,10 @@ export const queryBuilder = ({
 
   const joins: TableRelation[] = [];
 
-  while (requiredTables.size > 0 || tablesToExplore.length <= 0) {
+  while (requiredTables.size > 0 && tablesToExplore.length > 0) {
     const tableName = tablesToExplore.pop()!;
+    console.log(`Table to explore`, tableName);
+
     requiredTables.delete(tableName);
     exploredTables.add(tableName);
 
