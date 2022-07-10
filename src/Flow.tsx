@@ -25,13 +25,16 @@ const OverviewFlow = () => {
 
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
+  // Probably should find a more sophisticated way to merge nodes and edges
+  // from what's calculated from tables, and the edges that are manually added
+  // via onConnect
   useEffect(() => {
-    // Probably should find a more sophisticated way to merge nodes and edges
-    // from what's calculated from tables, and the edges that are manually added
-    // via onConnect
     setNodes(getTableNodes(tables));
+  }, [tables]);
+
+  useEffect(() => {
     setEdges(getTableRelationNodes(relations));
-  }, [tables, relations]);
+  }, [relations]);
 
   const onConnect = (params: Connection) => setEdges((e) => addEdge(params, e));
 
