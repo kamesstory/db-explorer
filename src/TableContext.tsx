@@ -14,6 +14,7 @@ export type TableRelation = {
   columnName: string;
   foreignTableName: string;
   foreignColumnName: string;
+  // TODO: is it one to one? one to many?
 };
 
 export type TableSchema = {
@@ -33,7 +34,6 @@ export const TableContextProvider: FunctionComponent<{
   const [tables, setTables] = useState<TableSchema[]>([]);
   const [relations, setRelations] = useState<TableRelation[]>([]);
 
-  const [selectedTables, setSelectedTables] = useState<string[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [createdRelations, setCreatedRelations] = useState<string[]>([]);
 
@@ -47,8 +47,6 @@ export const TableContextProvider: FunctionComponent<{
       value={{
         tables,
         relations,
-        selectedTables,
-        setSelectedTables,
         selectedColumns,
         setSelectedColumns,
       }}
@@ -61,15 +59,11 @@ export const TableContextProvider: FunctionComponent<{
 export const TableContext = createContext<{
   tables: TableSchema[];
   relations: TableRelation[];
-  selectedTables: string[];
-  setSelectedTables: Dispatch<SetStateAction<string[]>>;
   selectedColumns: string[];
   setSelectedColumns: Dispatch<SetStateAction<string[]>>;
 }>({
   tables: [],
   relations: [],
-  selectedTables: [],
-  setSelectedTables: () => {},
   selectedColumns: [],
   setSelectedColumns: () => {},
 });
