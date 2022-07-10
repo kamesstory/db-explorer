@@ -14,12 +14,12 @@ export const queryBuilder = ({
   tables,
   relations,
   selectedColumns,
-  selectedRelations,
-}: {
+}: // selectedRelations,
+{
   tables: TableSchema[];
   relations: TableRelation[];
   selectedColumns: string[];
-  selectedRelations: string[];
+  // selectedRelations: string[];
 }) => {
   /*
   Very basic query builder that is definitely not super efficient but proves the point.
@@ -45,6 +45,8 @@ export const queryBuilder = ({
     tableNameToNode.set(t.name, tableNode);
   });
 
+  console.log(`table name to node`, tableNameToNode);
+
   Array.from(tableNameToNode.entries()).forEach(([tableName, tableNode]) => {
     const tableRelations = relations.filter((r) => r.tableName === tableName);
 
@@ -53,41 +55,99 @@ export const queryBuilder = ({
         tableRelation.foreignTableName
       )!;
 
-      // TODO: gotta do two-way here
+      // The edges have to be two way, so we copy into foreign table node as well.
       tableNode.relations.push({
         relation: tableRelation,
         node: foreignTableNode,
+      });
+
+      const foreignTableRelation: TableRelation = {
+        tableName: tableRelation.foreignTableName,
+        columnName: tableRelation.foreignColumnName,
+        foreignTableName: tableRelation.tableName,
+        foreignColumnName: tableRelation.columnName,
+      };
+
+      foreignTableNode.relations.push({
+        relation: foreignTableRelation,
+        node: tableNode,
       });
     });
   });
 
   // Inefficient BFS to build the joins, but it should work for a small set since this is
-  // just a prototype
+  // just a prototype and people are unlikely to do anything complicated anyways.
   //
-  // Technically we can just use Dijkstra's and evaluate at every step, instead of the goal,
-  // whether or not all the required tables have been hit. If we completely saturate the graph
-  // with a starting node in it and we don't have all the required nodes (i.e. tables), this
-  // FROM statement is impossible to generate
+  // Actually best algorithm is a clustering algorithm where you connect all the required tables
+  // to each other inside a graph, and then you selectively include edges that are the shortest
+  // distance until the graph is fully connected. That gives you the least amount of joins total.
   //
-  // Actually best algorithm is the one where you connect all the required tables to each other
-  // inside a graph, and then you selectively include edges that are the shortest distance until
-  // the graph is fully connected. That gives you the least amount of joins total.
+  // The main problem here is that the algorithm will double count tables that are already joined
+  // but the solution here is to go into the graph and reduce the edge distances containing the
+  // already joined tables, whenever you add an edge. This still isn't globally optimal since the
+  // initial node picked might not be optimal, but it's a best guess for now.
 
-  const requiredColumns: TableColumn[] = selectedColumns.map(
-    (selectedColumn) => {
-      return tables
-        .flatMap((table) =>
-          table.columns.filter(
-            (tableColumn) => tableColumn.name === selectedColumn
-          )
+  const requiredColumns: TableColumn[] = selectedColumns.flatMap(
+    (selectedColumn) =>
+      tables.flatMap((table) =>
+        table.columns.filter(
+          (tableColumn) => tableColumn.name === selectedColumn
         )
-        .pop()!;
-    }
+      )
   );
-  const tablesToExplore = new Set<string>(
+
+  console.log(`required columns`, requiredColumns);
+
+  const requiredTables = new Set<string>(
     requiredColumns.map((column) => column.tableName)
   );
-  const exploredTables = new Set<string>();
 
-  const fromStatement = "FROM";
+  console.log(`required tables`, requiredTables);
+
+  const exploredTables = new Set<string>();
+  const fromTable = Array.from(requiredTables).pop()!;
+  const tablesToExplore: string[] = [fromTable];
+
+  const joins: TableRelation[] = [];
+
+  while (requiredTables.size > 0 || tablesToExplore.length <= 0) {
+    const tableName = tablesToExplore.pop()!;
+    requiredTables.delete(tableName);
+    exploredTables.add(tableName);
+
+    const tableNode = tableNameToNode.get(tableName)!;
+    tableNode.relations.forEach((relation) => {
+      const { foreignTableName } = relation.relation;
+
+      if (!exploredTables.has(foreignTableName)) {
+        tablesToExplore.push(foreignTableName);
+
+        joins.push(relation.relation);
+      }
+    });
+  }
+
+  // Initial (which just is the first table name)
+  const sqlExpressionParts: string[] = ["SELECT"];
+
+  sqlExpressionParts.push(
+    requiredColumns
+      .map((column) => `"${column.tableName}"."${column.name}"`)
+      .join(", ")
+  );
+
+  sqlExpressionParts.push("FROM");
+  sqlExpressionParts.push(fromTable);
+
+  // Subsequent:
+  //  source table, source column, foreign table, foreign column
+  joins.forEach((join) => {
+    sqlExpressionParts.push(
+      `JOIN "${join.foreignTableName}" ON "${join.tableName}"."${join.columnName}" = "${join.foreignTableName}"."${join.foreignColumnName}"`
+    );
+  });
+
+  const sqlExpression = sqlExpressionParts.join(" ");
+
+  return sqlExpression;
 };

@@ -1,12 +1,24 @@
 import "./App.css";
 import "./tailwind.css";
-import { FunctionComponent, useContext } from "react";
+import { FunctionComponent, useCallback, useContext } from "react";
 import { TableContext } from "./TableContext";
+import { queryBuilder } from "./queryBuilder";
 
 const QueryPreview: FunctionComponent = () => {
-  const { tables } = useContext(TableContext);
+  const { tables, relations, selectedColumns } = useContext(TableContext);
 
-  return <div>Yoyoyoyo</div>;
+  const buildQuery = useCallback(() => {
+    const sql = queryBuilder({ tables, relations, selectedColumns });
+
+    console.log(`SQL = `, sql);
+  }, [tables, relations, selectedColumns]);
+
+  return (
+    <div className="flex flex-col">
+      <span>Yoyoyoyo</span>
+      <button onClick={buildQuery}>Preview query</button>
+    </div>
+  );
 };
 
 export default QueryPreview;

@@ -590,6 +590,10 @@ video {
   flex-direction: row;
 }
 
+.flex-col {
+  flex-direction: column;
+}
+
 .items-start {
   align-items: flex-start;
 }
