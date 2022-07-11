@@ -169,7 +169,7 @@ export const queryBuilder = ({
   );
 
   sqlExpressionParts.push("FROM");
-  sqlExpressionParts.push(fromTable);
+  sqlExpressionParts.push(`"${fromTable}"`);
 
   // Subsequent:
   //  source table, source column, foreign table, foreign column
