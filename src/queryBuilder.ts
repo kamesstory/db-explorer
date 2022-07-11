@@ -121,12 +121,15 @@ export const queryBuilder = ({
 
   const exploredTables = new Set<string>();
   const fromTable = Array.from(requiredTables).pop()!;
-  const tablesToExplore: [string, TableRelation[]][] = [[fromTable, []]];
+  const tablesToExplore: {
+    tableName: string;
+    pathToTable: TableRelation[];
+  }[] = [{ tableName: fromTable, pathToTable: [] }];
 
   const joins: TableRelation[] = [];
 
   while (requiredTables.size > 0 && tablesToExplore.length > 0) {
-    const [tableName, pathToTable] = tablesToExplore.pop()!;
+    const { tableName, pathToTable } = tablesToExplore.pop()!;
     console.log(`Table to explore`, tableName);
 
     const tableIsRequired = requiredTables.delete(tableName);
@@ -148,10 +151,10 @@ export const queryBuilder = ({
       const { foreignTableName } = relation.relation;
 
       if (!exploredTables.has(foreignTableName)) {
-        tablesToExplore.push([
-          foreignTableName,
-          [...pathToTable, relation.relation],
-        ]);
+        tablesToExplore.push({
+          tableName: foreignTableName,
+          pathToTable: [...pathToTable, relation.relation],
+        });
       }
     });
   }
