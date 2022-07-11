@@ -121,25 +121,37 @@ export const queryBuilder = ({
 
   const exploredTables = new Set<string>();
   const fromTable = Array.from(requiredTables).pop()!;
-  const tablesToExplore: string[] = [fromTable];
+  const tablesToExplore: [string, TableRelation[]][] = [[fromTable, []]];
 
   const joins: TableRelation[] = [];
 
   while (requiredTables.size > 0 && tablesToExplore.length > 0) {
-    const tableName = tablesToExplore.pop()!;
+    const [tableName, pathToTable] = tablesToExplore.pop()!;
     console.log(`Table to explore`, tableName);
 
-    requiredTables.delete(tableName);
+    const tableIsRequired = requiredTables.delete(tableName);
     exploredTables.add(tableName);
+
+    if (tableIsRequired) {
+      // Since we stored the path to the table inside the queue, if we find
+      // that this table is required, we automatically add all relations to
+      // the joins. Then, we reset the path so that we don't add the same
+      // relations back in.
+      while (pathToTable.length > 0) {
+        const relation = pathToTable.shift()!;
+        joins.push(relation);
+      }
+    }
 
     const tableNode = tableNameToNode.get(tableName)!;
     tableNode.relations.forEach((relation) => {
       const { foreignTableName } = relation.relation;
 
       if (!exploredTables.has(foreignTableName)) {
-        tablesToExplore.push(foreignTableName);
-
-        joins.push(relation.relation);
+        tablesToExplore.push([
+          foreignTableName,
+          [...pathToTable, relation.relation],
+        ]);
       }
     });
   }
