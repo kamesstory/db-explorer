@@ -76,16 +76,31 @@ export const queryBuilder = ({
   });
 
   // Inefficient BFS to build the joins, but it should work for a small set since this is
-  // just a prototype and people are unlikely to do anything complicated anyways.
+  // just a prototype and people are unlikely to do anything complicated anyways. The main problem
+  // is that the current BFS implementation over-joins tables.
   //
-  // Actually best algorithm is a clustering algorithm where you connect all the required tables
+  // Best algorithm is a clustering algorithm where you strongly connect all the required tables
   // to each other inside a graph, and then you selectively include edges that are the shortest
   // distance until the graph is fully connected. That gives you the least amount of joins total.
   //
-  // The main problem here is that the algorithm will double count tables that are already joined
-  // but the solution here is to go into the graph and reduce the edge distances containing the
-  // already joined tables, whenever you add an edge. This still isn't globally optimal since the
-  // initial node picked might not be optimal, but it's a best guess for now.
+  // Since the algorithm will double count tables that are already joined within the path to other
+  // tables, we should reduce the edge distances between all tables that contain in-path joined
+  // tables by the distance the table would need to go to reach that in-path table. This still isn't
+  // globally optimal since the initial edge picked might not be optimal, but it heuristically should
+  // be close to global optimality.
+  //
+  // The algorithm:
+  // 1. BFS from each node to all the others, calculating the distance of the shortest path from one
+  // node to another (this is simply BFS since distance between any node to its direct relations is 1)
+  // 2. Now that we have a strongly connected distance graph, eliminate any nodes that do not belong
+  // to the required tables list (i.e. the tables that we are selecting columns from)
+  // 3. The remaining graph should only include required tables and is still strongly connected.
+  // Right now, we have not actually picked any edges yet.
+  // 4. Start picking edges by choosing the smallest distances. Whenever you pick an edge, add all tables
+  // that are a part of that edge / path into the list of tables that have already been joined. Then,
+  // reduce the distances for any edge that has tables in its path, which have already been joined.
+  // This is to stop double counting joined tables in edge distance calculations.
+  // 5. Stop when you have all the required tables in the list of tables that have already been joined.
 
   const requiredColumns: TableColumn[] = selectedColumns.flatMap(
     (selectedColumn) =>
